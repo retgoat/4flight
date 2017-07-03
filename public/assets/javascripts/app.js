@@ -11,20 +11,24 @@ var Flight = {
       } else {
         Flight.render_errors(data);
       }
+    }).error(function(){
+      var error_tpl = $("#error-tpl").html();
+      $("#errors").append(Mustache.to_html(error_tpl, {key: "Ooops!", value: "Something went wrong"}));
+      return Flight.overlay_off();
     })
   },
 
   render_flights: function(data, oneway){
     if (oneway) {
-      $("#search-results-to").show();
       var el = $("#search-results-to");
+      $(el).show();
       Flight.render_header(data.header.departing, el);
       Flight.render_flight_cards(data.data, el);
     } else {
-      $("#search-results-to").show();
-      $("#search-results-from").show();
       var el_to = $("#search-results-to");
       var el_from = $("#search-results-from");
+      $(el_to).show();
+      $(el_from).show();
       Flight.render_header(data.header.departing, el_to);
       Flight.render_flight_cards(data.data_to, el_to);
       Flight.render_header(data.header.returning, el_from);
@@ -44,13 +48,16 @@ var Flight = {
 
   clear_errors: function(){
     $("#errors").empty();
+    $(".error").remove();
   },
 
+  // renders header `SYD -> JFK'
   render_header: function(data, element){
     var header_tpl = $("#flight-header").html();
     element.prepend(Mustache.to_html(header_tpl, data));
   },
 
+  // renders flight card in a loop from all dates
   render_flight_cards: function(array, element){
     var flight_tpl = $("#flight-card").html();
     $.each(array, function(i, flights){
@@ -59,19 +66,19 @@ var Flight = {
       var list_item = $(element).find("li")[i];
       $(list_item).find("a").html(exact_date);
       if (flights[exact_date].length > 0) {
-        $.each(flights[exact_date], function(index, flight){
+        $.each(flights[exact_date], function(j, flight){
           $(container).find(".anchor").append(Mustache.to_html(flight_tpl, flight));
         });
         $(element).find("li").removeClass("active");
         var active_li = $(element).find("li")[2];
-        $(element).find('.nav-tabs li:eq(' + i + ') a').tab('show')
+        $(element).find('.nav-tabs li:eq(2) a').tab('show')
         $(active_li).addClass("active");
       } else {
         var no_flights_tpl = $("#no-flights").html();
-        $(container).find(".anchor").append(Mustache.to_html(no_flights_tpl, {}));
+        $(container).append(Mustache.to_html(no_flights_tpl, {}));
         $(list_item).addClass("disabled");
       }
-    });
+    }); // $.each
     element.css({"visibility":"visible"});
   },
 
@@ -91,6 +98,7 @@ var Flight = {
 
   prepare_for_search: function(){
     Flight.clear_errors();
+    $("#search-results-to, #search-results-from").find("li").removeClass("disabled");
     $("#search-results-to, #search-results-from").find(".card, .direction-header").remove();
     $("#search-results-to, #search-results-from").css({"visibility": "hidden"});
   },
