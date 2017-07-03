@@ -1,0 +1,38 @@
+<div class="panel panel-info search-form">
+  <div class="panel-heading">Flight search</div>
+  <div class="panel-body">
+
+    <form class="form-inline" id="search-form" method="POST" action="/search">
+      <div class="form-group">
+        <label for="from">From</label>
+        <input type="text" class="form-control typeahed" name="from-country" id="from" placeholder="Sydney">
+      </div>
+      <div class="form-group">
+        <label for="to">To</label>
+        <input type="text" class="form-control typeahed" name="to-country" id="to" placeholder="New York">
+      </div>
+
+      <div class="form-group">
+        <label for="departing">Departing</label>
+        <div class="bc_wrapper">
+          <input type="text" class="form-control" name="departing" id="departing" placeholder="2017-01-01">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="returning">Returning</label>
+        <div class="bc_wrapper">
+          <input type="text" class="form-control" name="returning" id="returning" placeholder="2017-01-01">
+        </div>
+      </div>
+
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="oneway"> One way trip
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-success btn-lg">Search</button>
+    </form>
+  </div>
+</div>
