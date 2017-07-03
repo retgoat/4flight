@@ -17,6 +17,7 @@
 <body>
   <div class="container">
     <%= erb :search_form %>
+    <div id="errors"></div>
     <div id="pluswrap">
       We're looking for available flights. Please be patient.
       <div id="floatingBarsG">
@@ -41,7 +42,7 @@
   <script src="/assets/javascripts/vendor/mustache.min.js"></script>
   <!-- TEMPLATES -->
   <script id="flight-card" type="x-tmpl-mustache">
-    <div class="panel panel-default card">
+    <div class="panel panel-default card scaling">
       <div class="panel-heading">
         <h4>
           <i class="fa fa-paper-plane" aria-hidden="true"></i>
@@ -80,7 +81,7 @@
     </div>
   </script>
 
-  <script id="flight-header" type="x-tmpl-mustache">
+  <script id="date-tab-list" type="x-tmpl-mustache">
     <div class="row">
       <div class="col-xs-12">
         <h2>
@@ -91,6 +92,46 @@
       </div>
     </div>
     <hr/>
+  </script>
+
+  <script id="date-tab-div" type="x-tmpl-mustache">
+    <div class="row">
+      <div class="col-xs-12">
+        <h2>
+          {{start.airportName}}
+          <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+          {{finish.airportName}}
+        </h2>
+      </div>
+    </div>
+    <hr/>
+  </script>
+
+  <script id="flight-header" type="x-tmpl-mustache">
+    <div class="row direction-header">
+      <div class="col-xs-12">
+        <h2>
+          {{from}}
+          <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+          {{to}}
+        </h2>
+      </div>
+      <hr/>
+    </div>
+  </script>
+
+
+  <script id="error-tpl" type="x-tmpl-mustache">
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      {{key}} {{value}}
+    </div>
+  </script>
+
+  <script id="no-flights" type="x-tmpl-mustache">
+    <div class="well">
+      Sorry, no flights for this date :(
+    </div>
   </script>
   <!-- TEMPLATES -->
   <script type="text/javascript" src="/assets/javascripts/app.js"></script>

@@ -1,5 +1,4 @@
 #pluswrap {
-  /*position: fixed;*/
   width: 100%;
   height:100%;
   display: flex;
@@ -15,8 +14,16 @@
   display: flex;
   margin: 0 auto;
 }
-.search-form {
+.search-form-wrapper {
   margin-top: 30px;
+}
+
+#search-results-to, #search-results-from {
+  visibility: hidden;
+}
+
+.nav{
+  padding-bottom: 20px;
 }
 
 .card {
@@ -27,7 +34,11 @@
   margin: 5px 0;
 }
 
-.card:hover{
+.scaling:hover{
   cursor: pointer;
   transform:  scale(1.01);
+}
+
+#errors{
+  margin: 10px 0;
 }

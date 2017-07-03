@@ -6,7 +6,6 @@ var Flight = {
       url: "/search",
       data: {from: from, to: to, departing: departing, returning: returning, oneway: oneway},
     }).success(function(data){
-      console.log(JSON.stringify(data));
       if (data.success == true) {
         Flight.render_flights(data, oneway);
       } else {
@@ -17,17 +16,18 @@ var Flight = {
 
   render_flights: function(data, oneway){
     if (oneway) {
-      var first = data.data[0];
+      $("#search-results-to").show();
       var el = $("#search-results-to");
-      Flight.render_header(first, el);
+      Flight.render_header(data.header.departing, el);
       Flight.render_flight_cards(data.data, el);
     } else {
-      console.log(JSON.stringify(data));
+      $("#search-results-to").show();
+      $("#search-results-from").show();
       var el_to = $("#search-results-to");
       var el_from = $("#search-results-from");
-      Flight.render_header(data.data_to[0], el_to);
+      Flight.render_header(data.header.departing, el_to);
       Flight.render_flight_cards(data.data_to, el_to);
-      Flight.render_header(data.data_from[0], el_from);
+      Flight.render_header(data.header.returning, el_from);
       Flight.render_flight_cards(data.data_from, el_from);
     }
     Flight.overlay_off();
@@ -35,24 +35,50 @@ var Flight = {
   },
 
   render_errors: function(data){
-    console.log("err");
+    var error_tpl = $("#error-tpl").html();
+    Object.keys(data.errors).forEach(function(key, index) {
+      $("#errors").append(Mustache.to_html(error_tpl, {key: key, value: data.errors[key]}));
+    });
+    Flight.overlay_off();
+  },
+
+  clear_errors: function(){
+    $("#errors").empty();
   },
 
   render_header: function(data, element){
     var header_tpl = $("#flight-header").html();
-    element.append(Mustache.to_html(header_tpl, data));
+    element.prepend(Mustache.to_html(header_tpl, data));
   },
 
   render_flight_cards: function(array, element){
     var flight_tpl = $("#flight-card").html();
-    $.each(array, function(index, flight){
-      element.append(Mustache.to_html(flight_tpl, flight));
+    $.each(array, function(i, flights){
+      exact_date = Object.keys(flights)[0];
+      var container = $(element).find(".tab-content").find(".tab-pane")[i];
+      var list_item = $(element).find("li")[i];
+      $(list_item).find("a").html(exact_date);
+      if (flights[exact_date].length > 0) {
+        $.each(flights[exact_date], function(index, flight){
+          $(container).find(".anchor").append(Mustache.to_html(flight_tpl, flight));
+        });
+        $(element).find("li").removeClass("active");
+        var active_li = $(element).find("li")[2];
+        $(element).find('.nav-tabs li:eq(' + i + ') a').tab('show')
+        $(active_li).addClass("active");
+      } else {
+        var no_flights_tpl = $("#no-flights").html();
+        $(container).find(".anchor").append(Mustache.to_html(no_flights_tpl, {}));
+        $(list_item).addClass("disabled");
+      }
     });
+    element.css({"visibility":"visible"});
   },
 
   select_flight: function(element){
     element.parent().find(".card").hide();
     element.show();
+    element.removeClass("scaling");
   },
 
   overlay_on: function(){
@@ -64,8 +90,9 @@ var Flight = {
   },
 
   prepare_for_search: function(){
-    $("#search-results-to").empty();
-    $("#search-results-from").empty();
+    Flight.clear_errors();
+    $("#search-results-to, #search-results-from").find(".card, .direction-header").remove();
+    $("#search-results-to, #search-results-from").css({"visibility": "hidden"});
   },
 }
 $(document).on("click", ".card", function(e){
@@ -81,10 +108,12 @@ $(document).ready(function(){
   $('input.typeahed[name="from-country"]').bootcomplete({url:'/airport'});
   $('input.typeahed[name="to-country"]').bootcomplete({url:'/airport'});
 
+  // one way checkbox
   $("#oneway").change(function(){
     $("#returning").prop('disabled', $(this).prop('checked'));
   });
 
+  // Search form submit
   $("form").submit(function(e){
     e.preventDefault()
     var from = $('input[name="from-country_id"]').val();
@@ -96,8 +125,9 @@ $(document).ready(function(){
     if (from.length > 0 && to.length > 0 && departing.length > 0 && (returning.length > 0 || oneway)) {
       Flight.prepare_for_search();
       Flight.overlay_on();
-      $(".search-form").animate(function(){})
       return Flight.search(from, to, departing, returning, oneway);
+    } else {
+      return Flight.render_errors({errors: {"Please fill all": "needed fields"}});
     }
   });
 });
