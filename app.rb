@@ -28,7 +28,7 @@ class App < Sinatra::Base
       search_one_way
     else
       # JSON.parse(File.read("stub_both.json")).to_json
-      search_both_ways if Date.parse(params[:departing]) > Date.today
+      search_both_ways
     end
   end
 
